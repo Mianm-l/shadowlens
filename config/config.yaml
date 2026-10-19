@@ -1,0 +1,31 @@
+server:
+  name: "shadowlens-oracle-mcp"
+  host: "0.0.0.0"
+  port: 8000
+  transport: "sse" # 支持 "sse" (微服务网络端点) 或 "stdio" (本地命令行)
+
+oracle:
+  user: "SHADOW_RO"
+  password: "ReadOnlyPassword#2026"
+  dsn: "192.168.1.100:1521/ORCLPDB1" # Oracle 主机:端口/服务名
+  min_pool: 1
+  max_pool: 5
+  timeout_seconds: 5
+  # dry_run_mode: 若为 true，在 Oracle 实际不可达时会自动启用高保真内置业务模拟数据集
+  # 极大方便本地开发、离线演示以及没有测试机时的快速联调
+  dry_run_mode: true
+
+security:
+  max_rows_per_query: 200
+  force_read_only_session: true
+  mask_sensitive_data: true
+  allowed_tables:
+    - "CT_PURCHASE_ORDER"
+    - "CT_RECEIVING_BILL"
+    - "NC_PAY_VOUCHER"
+    - "OA_COL_SUMMARY"
+    - "OA_COL_AFFAIR"
+
+paths:
+  dictionary_file: "config/schema-dictionary.yaml"
+  reconciliation_file: "config/reconciliation-rules.yaml"

@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  shadowlens-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shadowlens-oracle-mcp
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      # 内网 Oracle 数据库连接配置 (亦可直接在 config/config.yaml 中配置)
+      - ORACLE_DSN=192.168.1.100:1521/ORCLPDB1
+      - ORACLE_USER=SHADOW_RO
+      - ORACLE_PASSWORD=ReadOnlyPassword#2026
+      # 当内网数据库未就绪或离线演示时，设为 true 自动启用仿真数据集
+      - SHADOWLENS_DRY_RUN=true
+    volumes:
+      # 将配置文件目录挂载到宿主机，方便热更新字典与对账规则，无需重新构建镜像
+      - ./config:/app/config:ro
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/sse')\" || exit 0"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
